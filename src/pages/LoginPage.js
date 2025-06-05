@@ -18,7 +18,10 @@ export default function LoginPage() {
             return;
         }
 
-        axios.post('http://127.0.0.1:5000/login', { email, password })
+        axios.post('http://172.16.21.6:5000/login', {
+            email,     // this matches backend
+            password
+          })
             .then((response) => {
                 console.log(response);
                 // Store the authentication token
