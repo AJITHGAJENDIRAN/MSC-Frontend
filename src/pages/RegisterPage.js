@@ -9,7 +9,7 @@ export default function RegisterPage() {
 
   const registerUser = () => {
     axios
-      .post("http://127.0.0.1:5000/signup", {
+      .post("http://172.16.21.6/signup", {
         email: email,
         password: password,
       })
