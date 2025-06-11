@@ -18,7 +18,7 @@ const HCUAverageChart = () => {
 
   const fetchShips = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/ships');
+      const response = await axios.get('http://172.16.21.6:5000/api/ships');
       setShips(response.data);
     } catch (error) {
       console.error('Error fetching ships:', error);
@@ -34,7 +34,7 @@ const HCUAverageChart = () => {
 
     const [startDate, endDate] = dates;
     try {
-      const response = await axios.get('http://localhost:5000/api/average-particle-count', {
+      const response = await axios.get('http://172.16.21.6:5000/api/average-particle-count', {
         params: {
           start_date: startDate.format('YYYY-MM-DD'),
           end_date: endDate.format('YYYY-MM-DD'),

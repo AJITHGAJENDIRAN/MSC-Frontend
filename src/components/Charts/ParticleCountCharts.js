@@ -46,7 +46,7 @@ const ParticleCountCharts = () => {
 
     try {
       const response = await axios.get(
-        'http://127.0.0.1:5000/api/filtered-average-particle-count',
+        'http://172.16.21.6:5000/api/filtered-average-particle-count',
         {
           params: { start_date: startDate, end_date: endDate },
         }
