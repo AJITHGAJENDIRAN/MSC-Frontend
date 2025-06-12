@@ -15,7 +15,6 @@ const drawerWidth = 260;
 const DashboardLayout = () => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
 
   const theme = {
     primary: '#2563eb',
