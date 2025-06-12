@@ -30,7 +30,7 @@ const ShipPurifierLineChart = () => {
 
     try {
       const response = await axios.get(
-        "http://14.97.168.235:5000/api/purifier-count",
+        "http://172.16.21.6:5000/api/purifier-count",
         {
           params: {
             start_date: startDate,
@@ -75,19 +75,19 @@ const ShipPurifierLineChart = () => {
     boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)"
   };
 
-  // const CustomTooltip = ({ active, payload, label }) => {
-  //   if (active && payload && payload.length) {
-  //     return (
-  //       <div style={customTooltipStyle}>
-  //         <p style={{ margin: 0, fontWeight: "600" }}>{label}</p>
-  //         <p style={{ margin: "8px 0 0", color: "#52c41a" }}>
-  //           Purifier Count: {payload[0].value}
-  //         </p>
-  //       </div>
-  //     );
-  //   }
-  //   return null;
-  // };
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div style={customTooltipStyle}>
+          <p style={{ margin: 0, fontWeight: "600" }}>{label}</p>
+          <p style={{ margin: "8px 0 0", color: "#52c41a" }}>
+            Purifier Count: {payload[0].value}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <div style={{ width: "100%", height: "100%" }}>

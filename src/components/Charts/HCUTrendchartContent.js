@@ -39,7 +39,7 @@ const HCUTrendchartContent = () => {
 
   const fetchShips = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/ships');
+      const response = await axios.get('http://172.16.21.6:5000/api/ships');
       setShips(response.data);
     } catch (error) {
       setError('Failed to fetch ships');
@@ -57,7 +57,7 @@ const HCUTrendchartContent = () => {
     setError(null);
 
     try {
-      const response = await axios.get('http://localhost:5000/api/ship-hcu-details', {
+      const response = await axios.get('http://172.16.21.6:5000/api/ship-hcu-details', {
         params: {
           ship: selectedShip,
           startYear,
