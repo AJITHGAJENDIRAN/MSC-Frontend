@@ -5,145 +5,177 @@ import {
   ListItemIcon, ListItemText, Container
 } from '@mui/material';
 import {
-  Menu as MenuIcon, Dashboard as DashboardIcon,
-  Person as PersonIcon
+  Menu as MenuIcon,
+  Person as PersonIcon,
+  BarChart as BarChartIcon, // For Analytics
+  Assessment as AssessmentIcon, // For Average (or another chart icon)
+  LocalShipping as LocalShippingIcon, // For Ship Filtration
 } from '@mui/icons-material';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faShip } from '@fortawesome/free-solid-svg-icons'; // Import the specific ship icon
+
 
 const drawerWidth = 260;
 
 const DashboardLayout = () => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const navigate = useNavigate();
+  const location = useLocation(); // Get current location for active link styling
 
+  // Using a theme object like this is okay for small apps,
+  // but for larger apps, consider MUI's ThemeProvider for global theming.
   const theme = {
-    primary: '#2563eb',
-    secondary: '#f8fafc',
-    text: '#1e293b',
-    hover: '#dbeafe',
-    error: '#ef4444',
-    border: '#e2e8f0'
+    primary: '#2563eb', // Indigo-like blue
+    secondary: '#f8fafc', // Light gray/off-white background
+    text: '#1e293b', // Dark text
+    hover: '#e0edff', // Light blue for hover
+    active: '#bfdbfe', // Slightly darker blue for active state
+    error: '#ef4444', // Red for error/logout
+    border: '#e2e8f0', // Light border color
+    white: '#ffffff',
+    shadow: '0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)' // Subtle shadow
   };
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
+  const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login');
   };
 
+  // Updated menuItems with more specific icons
   const menuItems = [
-    { text: 'Overview', icon: <DashboardIcon fontSize="small" />, path: '/dashboard' },
-    { text: 'HCU Analytics', icon: <DashboardIcon fontSize="small" />, path: '/hcu-analytics' },
-    { text: 'HCU Average', icon: <DashboardIcon fontSize="small" />, path: '/hcu-average' },
-    { text: 'Ship Filtration Data', icon: <DashboardIcon fontSize="small" />, path: '/ship-filter' },
-    { text: 'Logout', icon: <PersonIcon fontSize="small" />, onClick: handleLogout },
+    { text: 'Overview', icon: <FontAwesomeIcon icon={faShip} fontSize="small" />, path: '/dashboard' },
+    { text: 'HCU Analytics', icon: <BarChartIcon fontSize="small" />, path: '/hcu-analytics' },
+    { text: 'HCU Average', icon: <AssessmentIcon fontSize="small" />, path: '/hcu-average' },
+    { text: 'Ship Filtration Data', icon: <LocalShippingIcon fontSize="small" />, path: '/ship-filter' },
   ];
 
   const drawer = (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', backgroundColor: theme.secondary, py: 2 }}>
-      <Toolbar sx={{
-        backgroundColor: theme.primary,
-        color: 'white',
-        minHeight: '50px !important',
+    <Box sx={{
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      backgroundColor: theme.secondary,
+      py: 2,
+      overflowY: 'auto', // Use overflowY to only scroll vertically
+      overflowX: 'hidden' // Prevent horizontal scroll
+    }}>
+      {/* Drawer Header/Branding - Using just the image */}
+      <Box sx={{
+        display: 'flex',
         justifyContent: 'center',
-        mb: 2
+        alignItems: 'center',
+        minHeight: '40px', // Provide a minimum height for the logo area
+        mb: 2,
+        px: 1 // Add horizontal padding for consistency
       }}>
-        <Typography variant="h6" noWrap sx={{ fontWeight: 600 }}>ViswaGroup</Typography>
-      </Toolbar>
+        <img
+          src="/images/loginimage-8fc45073.png" // Path relative to the 'public' folder
+          alt="ViswaGroup Logo"
+          style={{
+              maxHeight: '60px', // Adjust max height as needed
+              width: '200px' // Maintain aspect ratio
+          }}
+        />
+      </Box>
+
       <Divider sx={{ mb: 2 }} />
+
       <List dense sx={{ px: 1 }}>
-        {menuItems.filter(item => item.text !== 'Logout').map(item => (
+        {menuItems.map(item => (
           <ListItem
             button
             key={item.text}
-            component={item.path ? Link : 'div'}
+            component={Link}
             to={item.path}
-            onClick={item.onClick}
+            // Add styling for the active link
             sx={{
               borderRadius: 2,
-              px: 1.5,
-              py: 1,
+              px: 2,
+              py: 1.2,
               mb: 1,
-              '&:hover': { backgroundColor: theme.hover },
-              '& .MuiListItemIcon-root': { minWidth: '32px' }
+              color: location.pathname === item.path ? theme.text : theme.text, // Text color always dark
+              backgroundColor: location.pathname === item.path ? theme.active : 'transparent', // Active background
+              '&:hover': {
+                backgroundColor: location.pathname === item.path ? theme.active : theme.hover, // Maintain active bg on hover
+              },
+              '& .MuiListItemIcon-root': {
+                minWidth: '35px', // Adjusted to 35px as per your last code
+                color: location.pathname === item.path ? theme.primary : theme.text, // Icon color changes for active
+              }
             }}
           >
             <ListItemIcon>{item.icon}</ListItemIcon>
             <ListItemText
               primary={item.text}
-              primaryTypographyProps={{ fontSize: 16, fontWeight: 400 }}
+              primaryTypographyProps={{ fontSize: 15, fontWeight: 500 }}
             />
           </ListItem>
         ))}
       </List>
-      <Box sx={{ flexGrow: 1 }} />
+
+      <Box sx={{ flexGrow: 1 }} /> {/* Pushes logout to bottom */}
       <Divider sx={{ my: 2 }} />
+
       <List dense sx={{ px: 1 }}>
         <ListItem
           button
           onClick={handleLogout}
           sx={{
             borderRadius: 2,
-            px: 1.5,
-            py: 1,
+            px: 2,
+            py: 1.2,
             '&:hover': {
               backgroundColor: theme.error,
-              color: 'white',
-              '& .MuiListItemIcon-root': { color: 'white' }
+              color: theme.white,
+              '& .MuiListItemIcon-root': { color: theme.white }
             },
-            '& .MuiListItemIcon-root': { minWidth: '32px' }
+            '& .MuiListItemIcon-root': { minWidth: '32px', color: theme.text }
           }}
         >
           <ListItemIcon><PersonIcon fontSize="small" /></ListItemIcon>
           <ListItemText
             primary="Logout"
-            primaryTypographyProps={{ fontSize: 16, fontWeight: 400 }}
+            primaryTypographyProps={{ fontSize: 15, fontWeight: 500 }}
           />
         </ListItem>
       </List>
     </Box>
   );
 
-  // const getTitle = () => {
-  //   const match = menuItems.find(item => location.pathname.startsWith(item.path));
-  //   return match ? match.text : 'Dashboard';
-  // };
-
   return (
     <Box sx={{ display: 'flex', backgroundColor: theme.secondary }}>
       <CssBaseline />
 
-      {/* Top App Bar */}
+      {/* Top AppBar */}
       <AppBar
         position="fixed"
         elevation={0}
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
-          backgroundColor: 'white',
+          backgroundColor: theme.white,
           borderBottom: `1px solid ${theme.border}`,
-          boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
+          boxShadow: theme.shadow
         }}
       >
-        <Toolbar sx={{ minHeight: '64px !important' }}>
+        <Toolbar sx={{ minHeight: '75px !important' }}>
           <IconButton
-            color="inherit"
             edge="start"
             onClick={handleDrawerToggle}
             sx={{ mr: 2, display: { sm: 'none' } }}
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap sx={{ color: theme.text, fontWeight: 500 }}>
+          <Typography variant="h6" noWrap sx={{ color: '#1e293b', fontWeight: 550 }}>
             Dashboard
           </Typography>
         </Toolbar>
       </AppBar>
 
-      {/* Sidebar */}
+      {/* Sidebar Drawer */}
       <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}>
         <Drawer
           variant="temporary"
@@ -157,6 +189,7 @@ const DashboardLayout = () => {
         >
           {drawer}
         </Drawer>
+
         <Drawer
           variant="permanent"
           sx={{
@@ -179,27 +212,23 @@ const DashboardLayout = () => {
         sx={{
           flexGrow: 1,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
-          minHeight: '200vh',
-          pt: 8, // Enough top space for AppBar
-          pb: 4,
-          px: { xs: 2, sm: 3, md: 5 },
-          backgroundColor: theme.secondary
+          minHeight: '100vh',
+          pt: 8, // Padding-top to clear the AppBar
+          pb: 4, // Padding-bottom for content below fold
+          px: { xs: 2, sm: 3, md: 5 }, // Horizontal padding responsive
+          backgroundColor: theme.secondary,
+          overflow: 'hidden' // Prevents horizontal scroll for the main content area itself
         }}
       >
-        {/* <Typography variant="h5" sx={{ fontWeight: 600, mb: 3, color: theme.text }}>
-          {getTitle()}
-        </Typography> */}
-
         <Container
           maxWidth="xl"
           disableGutters
           sx={{
-            backgroundColor: 'white',
+            backgroundColor: theme.white,
             borderRadius: 2,
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+            boxShadow: theme.shadow,
             p: { xs: 2, sm: 3, md: 4 },
-            overflowX: 'auto',
-            minHeight: 'calc(100vh - 160px)'
+            minHeight: 'calc(100vh - 160px)', // Adjust height considering AppBar and overall padding
           }}
         >
           <Outlet />
