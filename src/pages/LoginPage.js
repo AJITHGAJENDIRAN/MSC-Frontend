@@ -18,7 +18,7 @@ export default function LoginPage() {
             return;
         }
 
-        axios.post('http://14.97.168.235/login', {
+        axios.post("http://52.140.61.220:5000/login", {
             email,     // this matches backend
             password
           })

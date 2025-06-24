@@ -9,7 +9,7 @@ export default function RegisterPage() {
 
   const registerUser = () => {
     axios
-      .post("http://14.97.168.235/signup", {
+      .post("http://52.140.61.220:5000/signup", {
         email: email,
         password: password,
       })
@@ -75,7 +75,7 @@ export default function RegisterPage() {
               <input type="checkbox" id="rememberMe" />
               <label htmlFor="rememberMe" style={{ marginLeft: "5px" }}>Remember me</label>
             </div>
-            {/* <a href="#" style={{ color: "red" }}>Forgot password?</a> */}
+            
           </div>
 
           <button

@@ -22,7 +22,7 @@ const PieChartComponent = () => {
 
   const fetchData = useCallback(async () => {
     try {
-      let url = "http://172.16.21.6:5000/api/sample-type-count";
+      let url = "http://52.140.61.220:5000/api/sample-type-count";
 
       const params = new URLSearchParams();
       if (startDate) params.append("start_date", startDate);

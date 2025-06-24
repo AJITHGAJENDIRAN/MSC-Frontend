@@ -30,7 +30,7 @@ const ShipPurifierLineChart = () => {
 
     try {
       const response = await axios.get(
-        "http://172.16.21.6:5000/api/purifier-count",
+        "http://52.140.61.220:5000/api/purifier-count",
         {
           params: {
             start_date: startDate,

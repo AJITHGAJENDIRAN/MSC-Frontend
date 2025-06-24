@@ -30,7 +30,7 @@ const ShipHCULineChart = () => {
 
     try {
       const response = await axios.get(
-        "http://14.97.168.235:5000/api/ship-hcu-count",
+        "http://52.140.61.220:5000/api/ship-hcu-count",
         {
           params: {
             start_date: startDate,

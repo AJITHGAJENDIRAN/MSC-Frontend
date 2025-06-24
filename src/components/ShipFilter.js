@@ -13,7 +13,7 @@ const ShipFilter = () => {
 
   const fetchParticleData = async () => {
     try {
-      const response = await axios.get('http://14.97.168.235/api/filtered-average-particle-count', {
+      const response = await axios.get("http://52.140.61.220:5000/api/filtered-average-particle-count", {
         params: {
           start_date: '2022-03-01',
           end_date: '2025-03-15'
