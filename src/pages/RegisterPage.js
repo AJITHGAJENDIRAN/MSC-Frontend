@@ -9,7 +9,7 @@ export default function RegisterPage() {
 
   const registerUser = () => {
     axios
-      .post("http://172.16.21.6:5000/signup", {
+      .post("http://14.97.168.235/signup", {
         email: email,
         password: password,
       })
@@ -21,6 +21,7 @@ export default function RegisterPage() {
         console.log(error, "error");
         if (error.response && error.response.status === 401) {
           alert("Invalid credentials");
+          console.log(response);
         }
       });
   };
