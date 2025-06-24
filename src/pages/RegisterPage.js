@@ -21,7 +21,6 @@ export default function RegisterPage() {
         console.log(error, "error");
         if (error.response && error.response.status === 401) {
           alert("Invalid credentials");
-          console.log(response);
         }
       });
   };
