@@ -10,6 +10,7 @@ import Dashboard from './components/Dashboard';
 import HCUAnalytics from './components/HCUAnalytics';
 import HCUAverage from './components/HCUAverage';
 import ShipFilter from './components/ShipFilter';
+import Dashboard1 from './components/Dashboard1';
 
 const theme = createTheme();
 
@@ -67,6 +68,16 @@ const App = () => {
                 }
               >
                 <Route index element={<ShipFilter />} />
+              </Route>
+              <Route
+                path="/dashboard1"
+                element={
+                  <PrivateRoute>
+                    <DashboardLayout />
+                  </PrivateRoute>
+                }
+              >
+                <Route index element={<Dashboard1 />} />
               </Route>
               <Route path="/" element={<Navigate to="/login" />} />
             </Routes>

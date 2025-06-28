@@ -50,6 +50,7 @@ const DashboardLayout = () => {
     { text: 'HCU Analytics', icon: <BarChartIcon fontSize="small" />, path: '/hcu-analytics' },
     { text: 'HCU Average', icon: <AssessmentIcon fontSize="small" />, path: '/hcu-average' },
     { text: 'Ship Filtration Data', icon: <LocalShippingIcon fontSize="small" />, path: '/ship-filter' },
+    { text: 'Dashboard 1', icon: <LocalShippingIcon fontSize="small" />, path: '/dashboard1' },
   ];
 
   const drawer = (
