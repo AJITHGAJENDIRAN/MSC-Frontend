@@ -30,12 +30,9 @@ const ShipPurifierLineChart = () => {
 
     try {
       const response = await axios.get(
-        "http://52.140.61.220:5000/api/purifier-count",
+        "http://127.0.0.1:5000/api/purifier-count",
         {
-          params: {
-            start_date: startDate,
-            end_date: endDate
-          }
+          params: { start_date: startDate, end_date: endDate }
         }
       );
 
@@ -56,10 +53,7 @@ const ShipPurifierLineChart = () => {
   };
 
   useEffect(() => {
-    fetchData(
-      dates[0].format("YYYY-MM-DD"),
-      dates[1].format("YYYY-MM-DD")
-    );
+    fetchData(dates[0].format("YYYY-MM-DD"), dates[1].format("YYYY-MM-DD"));
   }, [dates]);
 
   const handleDateChange = (newDates) => {
@@ -67,110 +61,101 @@ const ShipPurifierLineChart = () => {
     setDates(newDates);
   };
 
-  const customTooltipStyle = {
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
-    border: "1px solid #e8e8e8",
-    borderRadius: "4px",
-    padding: "10px",
-    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)"
-  };
-
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div style={customTooltipStyle}>
-          <p style={{ margin: 0, fontWeight: "600" }}>{label}</p>
-          <p style={{ margin: "8px 0 0", color: "#52c41a" }}>
-            Purifier Count: {payload[0].value}
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
-
   return (
     <div style={{ width: "100%", height: "100%" }}>
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '16px'
-      }}>
-        <h3 style={{
-          fontSize: '16px',
-          fontWeight: 600,
-          color: '#1a237e',
-          margin: 0
-        }}>Ship Purifier Distribution</h3>
+      {/* Header */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 8,
+          flexWrap: "wrap"
+        }}
+      >
+        <span
+          style={{
+            fontSize: "14px",
+            fontWeight: 600,
+            color: "#1a237e",
+          }}
+        >
+          Ship Purifier Sample Count
+        </span>
         <RangePicker
+          size="small"
           value={dates}
           onChange={handleDateChange}
           allowClear={false}
-          style={{ borderRadius: '8px' }}
+          style={{ borderRadius: 6 }}
         />
       </div>
 
+      {/* Loading */}
       {loading && (
-        <div style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100%"
-        }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            height: 200,
+            alignItems: "center",
+          }}
+        >
           <Spin size="large" />
         </div>
       )}
 
-      {error && <Alert
-        message={error}
-        type="error"
-        showIcon
-        style={{ marginBottom: "16px", borderRadius: "8px" }}
-      />}
+      {/* Error */}
+      {error && (
+        <Alert
+          message={error}
+          type="error"
+          showIcon
+          style={{ marginBottom: "8px", borderRadius: 6 }}
+        />
+      )}
 
+      {/* Chart */}
       {!loading && !error && (
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height={320}>
           <BarChart
             data={data}
-            margin={{ top: 20, right: 30, left: 30, bottom: 100 }}
+            margin={{ top: 10, right: 10, left: 0, bottom: 80 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
             <XAxis
               dataKey="ship_name"
-              angle={-65}
+              angle={-60}
               textAnchor="end"
               interval={0}
-              height={100}
-              tick={{ fill: "#4b5563", fontSize: '12px', fontWeight: '500' }}
+              height={80}
+              tick={{ fill: "#555", fontSize: 11 }}
             />
             <YAxis
               label={{
                 value: "Purifier Count",
                 angle: -90,
                 position: "insideLeft",
-                offset: 15,
-                style: { fill: "#4b5563", fontSize: '14px', fontWeight: '500' }
+                offset: 10,
+                style: { fill: "#333", fontSize: 12 },
               }}
+              tick={{ fill: "#555", fontSize: 11 }}
               allowDecimals={false}
-              tick={{ fill: "#4b5563", fontSize: '12px' }}
             />
-           <Tooltip
+            <Tooltip
               contentStyle={{
-                backgroundColor: '#ffffff',
-                border: 'none',
-                borderRadius: '8px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                padding: '12px'
+                backgroundColor: "#fff",
+                borderRadius: 6,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
               }}
-              cursor={{ fill: 'rgba(82,196,26,0.1)' }}
+              cursor={{ fill: "rgba(82,196,26,0.1)" }}
             />
-            <Legend wrapperStyle={{ paddingTop: "20px" }} />
+            <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "8px" }} />
             <Bar
               dataKey="count"
-              name="Purifier Sample Count"
+              name="Purifier Count"
               fill="#52c41a"
-              barSize={50}
+              barSize={40}
               radius={[4, 4, 0, 0]}
             />
           </BarChart>

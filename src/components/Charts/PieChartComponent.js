@@ -1,38 +1,33 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { PieChart, Pie, Tooltip, Legend, Cell } from "recharts";
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  useTheme,
-  useMediaQuery
-} from "@mui/material";
+import { PieChart, Pie, Tooltip, Legend, Cell, ResponsiveContainer, Label } from "recharts";
+import { Box, Typography, useTheme, useMediaQuery } from "@mui/material";
+import { DatePicker } from "antd";
+import dayjs from "dayjs";
+
+const { RangePicker } = DatePicker;
 
 const COLORS = ["#1976d2", "#2e7d32", "#ed6c02", "#d32f2f"];
 
 const PieChartComponent = () => {
   const [data, setData] = useState([]);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [dateRange, setDateRange] = useState(null);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const fetchData = useCallback(async () => {
     try {
-      let url = "http://52.140.61.220:5000/api/sample-type-count";
+      let url = "http://127.0.0.1:5000/api/sample-type-count";
 
       const params = new URLSearchParams();
-      if (startDate) params.append("start_date", startDate);
-      if (endDate) params.append("end_date", endDate);
-
-      if (params.toString()) {
-        url += "?" + params.toString();
-      }
+      if (dateRange?.[0]) params.append("start_date", dayjs(dateRange[0]).format("YYYY-MM-DD"));
+      if (dateRange?.[1]) params.append("end_date", dayjs(dateRange[1]).format("YYYY-MM-DD"));
+      if (params.toString()) url += "?" + params.toString();
 
       const response = await axios.get(url);
+
+      const totalCount = data.reduce((acc, item) => acc + item.value, 0);
 
       const chartData = Object.keys(response.data).map((key, index) => ({
         name: key,
@@ -43,98 +38,68 @@ const PieChartComponent = () => {
       setData(chartData);
     } catch (error) {
       console.error("Error fetching data:", error);
+      setData([]);
     }
-  }, [startDate, endDate]);
+  }, [dateRange]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: isMobile ? "column" : "row",
-        gap: 4,
-        width: "100%",
-        alignItems: isMobile ? "stretch" : "flex-start",
-        justifyContent: "space-between",
-      }}
-    >
-      {/* Filters Section */}
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}>
       <Box
         sx={{
-          width: isMobile ? "100%" : 280,
           display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          flexShrink: 0,
+          flexDirection: isMobile ? "column" : "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 1,
         }}
       >
-        <Typography variant="h6" fontWeight={600}>
-          Filters
+        <Typography variant="subtitle1" fontWeight={600}>
+          Sample Type Distribution
         </Typography>
-        <TextField
-          label="Start Date"
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          InputLabelProps={{ shrink: true }}
-          fullWidth
+
+        <RangePicker
+          style={{ width: isMobile ? "100%" : 220 }}
+          value={dateRange}
+          onChange={(dates) => setDateRange(dates)}
+          format="YYYY-MM-DD"
+          size="small"
         />
-        <TextField
-          label="End Date"
-          type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          InputLabelProps={{ shrink: true }}
-          fullWidth
-        />
-        <Button variant="contained" onClick={fetchData}>
-          Apply Filters
-        </Button>
       </Box>
 
-      {/* Chart Section */}
-      <Box
-        sx={{
-          flexGrow: 1,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: 300,
-          width: "100%",
-        }}
-      >
+      <Box sx={{ flex: 1, minHeight: 240 }}>
         {data.length > 0 ? (
-          <PieChart width={isMobile ? 300 : 400} height={isMobile ? 300 : 400}>
-            
-            <Pie
-              data={data}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={isMobile ? 80 : 120}  
-              label
-            >
-              {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-            </Pie>
-            
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "rgba(255, 255, 255, 0.95)",
-                border: "none",
-                borderRadius: "0px",
-                boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-              }}
-            />
-            <Legend verticalAlign="bottom" iconType="circle" />
-          </PieChart>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={data}
+                dataKey="value"
+                nameKey="name"
+                innerRadius="50%"
+                outerRadius="80%"
+                label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                labelLine={false}
+              >
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend
+                verticalAlign="bottom"
+                layout="horizontal"
+                iconSize={10}
+                wrapperStyle={{
+                  fontSize: isMobile ? "0.7rem" : "0.75rem",
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
         ) : (
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body2" color="text.secondary">
             No data available
           </Typography>
         )}

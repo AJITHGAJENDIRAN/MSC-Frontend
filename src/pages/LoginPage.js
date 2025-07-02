@@ -27,7 +27,7 @@ export default function LoginPage() {
                 // Store the authentication token
                 localStorage.setItem('token', response.data.token);
                 // Redirect to dashboard after successful login
-                navigate("/dashboard");
+                navigate("/dashboard1");
             })
             .catch((error) => {
                 console.error(error);
@@ -39,8 +39,12 @@ export default function LoginPage() {
 
     return (
         <div className="login-container">
-            <div className="background">
-                <img src="/images/bg.jpg" alt="Background" className="background-image" />
+            <div className="animated-image-container">
+                <img
+                    src="/images/ship_login-0e181910.png"
+                    alt="Animated Ship"
+                    className="animated"
+                />
             </div>
             <div className="login-box">
                 <h2>Welcome to ViswaGroup</h2>
