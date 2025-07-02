@@ -82,3 +82,23 @@
     color: blue;
     text-decoration: none;
 }
+
+/* Additional Styles for Login Animation */
+@keyframes up-down {
+  0% {
+    transform: translateY(0px);
+  }
+  100% {
+    transform: translateY(-20px);
+  }
+}
+
+.animated {
+  animation: up-down 2s ease-in-out infinite alternate-reverse both;
+  width: 800px; /* Adjust size as needed */
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  margin-top: 30px;
+}
+
