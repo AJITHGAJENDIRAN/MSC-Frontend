@@ -26,7 +26,7 @@ const ShipHCULineChart = () => {
     setError(null);
 
     try {
-      const response = await axios.get("http://127.0.0.1:5000/api/ship-hcu-count", {
+      const response = await axios.get("http://52.140.61.220:5000/api/ship-hcu-count", {
         params: {
           start_date: startDate,
           end_date: endDate,

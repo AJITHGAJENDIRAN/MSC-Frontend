@@ -22,7 +22,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 dayjs.extend(customParseFormat);
 const { RangePicker } = DatePicker;
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
-
+// new code
 const Dashboard1 = () => {
   const [shipOptions, setShipOptions] = useState([]);
   const [selectedShip, setSelectedShip] = useState('');
@@ -36,7 +36,7 @@ const Dashboard1 = () => {
   
   const fetchShipOptions = async () => {
   try {
-    const response = await axios.get('http://127.0.0.1:5000/api/ships');
+    const response = await axios.get('http://52.140.61.220:5000/api/ships');
     const ships = Array.isArray(response.data?.ships)
       ? response.data.ships
       : Array.isArray(response.data)
@@ -61,7 +61,7 @@ const Dashboard1 = () => {
     if (!selectedShip || !dateRange?.[0] || !dateRange?.[1]) return;
     setLoading(true);
     try {
-      const response = await axios.get('http://127.0.0.1:5000/api/ship-summary', {
+      const response = await axios.get('http://52.140.61.220:5000/api/ship-summary', {
         params: {
           ship: selectedShip,
           start_date: dayjs(dateRange[0]).format('YYYY-MM-DD'),

@@ -18,7 +18,7 @@ const PieChartComponent = () => {
 
   const fetchData = useCallback(async () => {
     try {
-      let url = "http://127.0.0.1:5000/api/sample-type-count";
+      let url = "http://52.140.61.220:5000/api/sample-type-count";
 
       const params = new URLSearchParams();
       if (dateRange?.[0]) params.append("start_date", dayjs(dateRange[0]).format("YYYY-MM-DD"));
