@@ -13,39 +13,43 @@ import {
 } from "recharts";
 import dayjs from "dayjs";
 
-const ShipHCULineChart = ({ dateRange }) => {
+const ShipHCULineChart = ({ dateRange, selectedShips }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const fetchData = async (startDate, endDate) => {
-    setLoading(true);
-    setError(null);
+  setLoading(true);
+  setError(null);
 
-    try {
-      const response = await axios.get("http://52.140.61.220:5000/api/ship-hcu-count", {
-        params: {
-          start_date: startDate,
-          end_date: endDate,
-        },
-      });
+  try {
+    const response = await axios.get("http://52.140.61.220:5000/api/ship-hcu-count", {
+      params: {
+        start_date: startDate,
+        end_date: endDate,
+      },
+    });
 
-      const formattedData = Object.entries(response.data || {})
-        .map(([ship, count]) => ({
-          ship_name: ship,
-          count: count,
-        }))
-        .sort((a, b) => b.count - a.count);
+    const responseData = response.data || {};
 
-      setData(formattedData);
-    } catch (err) {
-      console.error("Error fetching HCU data:", err);
-      setError("Failed to fetch HCU data. Please try again later.");
-      setData([]); // Clear chart on error
-    } finally {
-      setLoading(false);
-    }
-  };
+    // Filter based on selected ships
+    const filteredData = Object.entries(responseData)
+      .filter(([shipName]) => selectedShips.length === 0 || selectedShips.includes(shipName))
+      .map(([ship, count]) => ({
+        ship_name: ship,
+        count: count,
+      }))
+      .sort((a, b) => b.count - a.count);
+
+    setData(filteredData);
+  } catch (err) {
+    console.error("Error fetching HCU data:", err);
+    setError("Failed to fetch HCU data. Please try again later.");
+    setData([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     if (!dateRange || !dateRange[0] || !dateRange[1]) return;
@@ -54,31 +58,12 @@ const ShipHCULineChart = ({ dateRange }) => {
     const endDate = dayjs(dateRange[1]).format("YYYY-MM-DD");
 
     fetchData(startDate, endDate);
-  }, [dateRange]);
+  }, [dateRange, selectedShips]);
 
   return (
     <div style={{ width: "100%", height: "100%" }}>
-      <span
-        style={{
-          fontSize: "14px",
-          fontWeight: 600,
-          color: "#1a237e",
-          marginBottom: 8,
-          display: "block",
-        }}
-      >
-        
-      </span>
-
       {loading ? (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            height: 200,
-            alignItems: "center",
-          }}
-        >
+        <div style={{ display: "flex", justifyContent: "center", height: 200, alignItems: "center" }}>
           <Spin size="large" />
         </div>
       ) : error ? (
@@ -96,103 +81,47 @@ const ShipHCULineChart = ({ dateRange }) => {
           style={{ marginBottom: "8px", borderRadius: 6 }}
         />
       ) : (
-        // <ResponsiveContainer width="100%" height={320}>
-        //   <BarChart
-        //     data={data}
-        //     margin={{ top: 10, right: 10, left: 0, bottom: 80 }}
-        //   >
-        //     <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-        //     <XAxis
-        //       dataKey="ship_name"
-        //       angle={-60}
-        //       textAnchor="end"
-        //       interval={0}
-        //       height={80}
-        //       tick={{ fill: "#555", fontSize: 11 }}
-        //     />
-        //     <YAxis
-        //       label={{
-        //         value: "Count",
-        //         angle: -90,
-        //         position: "insideLeft",
-        //         offset: 10,
-        //         style: { fill: "#333", fontSize: 12 },
-        //       }}
-        //       tick={{ fill: "#555", fontSize: 11 }}
-        //       allowDecimals={false}
-        //     />
-        //     <Tooltip
-        //       contentStyle={{
-        //         backgroundColor: "#fff",
-        //         borderRadius: 6,
-        //         boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-        //       }}
-        //       cursor={{ fill: "rgba(24,144,255,0.1)" }}
-        //     />
-        //     <Legend
-        //       wrapperStyle={{
-        //         fontSize: "12px",
-        //         paddingTop: "8px",
-        //       }}
-        //     />
-        //     <Bar
-        //       dataKey="count"
-        //       name="HCU Count"
-        //       fill="#1890ff"
-        //       barSize={40}
-        //       radius={[4, 4, 0, 0]}
-        //     />
-        //   </BarChart>
-        // </ResponsiveContainer>
         <ResponsiveContainer width="100%" height={320}>
-  <BarChart
-    data={data}
-    margin={{ top: 10, right: 10, left: 0, bottom: 80 }}
-  >
-    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-    <XAxis
-      dataKey="ship_name"
-      angle={-60}
-      textAnchor="end"
-      interval={0}
-      height={80}
-      tick={{ fill: "#555", fontSize: 11 }}
-    />
-    <YAxis
-      label={{
-        value: "Count",
-        angle: -90,
-        position: "insideLeft",
-        offset: 10,
-        style: { fill: "#333", fontSize: 12 },
-      }}
-      tick={{ fill: "#555", fontSize: 11 }}
-      allowDecimals={false}
-    />
-    <Tooltip
-      contentStyle={{
-        backgroundColor: "#fff",
-        borderRadius: 6,
-        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-      }}
-      cursor={{ fill: "rgba(24,144,255,0.1)" }}
-    />
-    <Legend
-      wrapperStyle={{
-        fontSize: "12px",
-        paddingTop: "8px",
-      }}
-    />
-    <Bar
-      dataKey="count"
-      name="HCU Count"
-      fill="#1890ff"
-      barSize={40}
-      radius={[4, 4, 0, 0]}
-      label={{ position: 'top', fill: '#333', fontSize: 12 }}
-    />
-  </BarChart>
-</ResponsiveContainer>
+          <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 80 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+            <XAxis
+              dataKey="ship_name"
+              angle={-60}
+              textAnchor="end"
+              interval={0}
+              height={80}
+              tick={{ fill: "#555", fontSize: 11 }}
+            />
+            <YAxis
+              label={{
+                value: "Count",
+                angle: -90,
+                position: "insideLeft",
+                offset: 10,
+                style: { fill: "#333", fontSize: 12 },
+              }}
+              tick={{ fill: "#555", fontSize: 11 }}
+              allowDecimals={false}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#fff",
+                borderRadius: 6,
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              }}
+              cursor={{ fill: "rgba(24,144,255,0.1)" }}
+            />
+            <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "8px" }} />
+            <Bar
+              dataKey="count"
+              name="HCU Count"
+              fill="#1890ff"
+              barSize={40}
+              radius={[4, 4, 0, 0]}
+              label={{ position: "top", fill: "#333", fontSize: 12 }}
+            />
+          </BarChart>
+        </ResponsiveContainer>
       )}
     </div>
   );

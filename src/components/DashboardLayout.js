@@ -14,6 +14,7 @@ import {
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShip } from '@fortawesome/free-solid-svg-icons';
+import { text } from '@fortawesome/fontawesome-svg-core';
 
 const drawerWidth = 260;
 
@@ -45,6 +46,7 @@ const DashboardLayout = () => {
   const menuItems = [
     { text: 'Dashboard', icon: <AssessmentIcon fontSize="small" />, path: '/dashboard1' },
     { text: 'Overall View', icon: <FontAwesomeIcon icon={faShip} fontSize="small" />, path: '/dashboard' },
+    
   ];
 
   const drawer = (
