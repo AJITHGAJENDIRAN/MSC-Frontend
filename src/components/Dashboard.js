@@ -36,6 +36,7 @@ const Dashboard = () => {
     'Last 3 Months': [dayjs().subtract(3, 'month'), dayjs()],
     'Last 6 Months': [dayjs().subtract(6, 'month'), dayjs()],
     'Last 1 Year': [dayjs().subtract(1, 'year'), dayjs()],
+    'Last 2 Year': [dayjs().subtract(2, 'year'), dayjs()],
   }}
 />
       </Box>
