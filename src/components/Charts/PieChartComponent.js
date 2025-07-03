@@ -1,17 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { PieChart, Pie, Tooltip, Legend, Cell, ResponsiveContainer, Label } from "recharts";
+import { PieChart, Pie, Tooltip, Legend, Cell, ResponsiveContainer } from "recharts";
 import { Box, Typography, useTheme, useMediaQuery } from "@mui/material";
-import { DatePicker } from "antd";
 import dayjs from "dayjs";
-
-const { RangePicker } = DatePicker;
 
 const COLORS = ["#1976d2", "#2e7d32", "#ed6c02", "#d32f2f"];
 
-const PieChartComponent = () => {
+const PieChartComponent = ({ dateRange }) => {
   const [data, setData] = useState([]);
-  const [dateRange, setDateRange] = useState(null);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -26,8 +22,6 @@ const PieChartComponent = () => {
       if (params.toString()) url += "?" + params.toString();
 
       const response = await axios.get(url);
-
-      const totalCount = data.reduce((acc, item) => acc + item.value, 0);
 
       const chartData = Object.keys(response.data).map((key, index) => ({
         name: key,
@@ -48,27 +42,9 @@ const PieChartComponent = () => {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: isMobile ? "column" : "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: 1,
-        }}
-      >
-        <Typography variant="subtitle1" fontWeight={600}>
-          Sample Type Distribution
-        </Typography>
-
-        <RangePicker
-          style={{ width: isMobile ? "100%" : 220 }}
-          value={dateRange}
-          onChange={(dates) => setDateRange(dates)}
-          format="YYYY-MM-DD"
-          size="small"
-        />
-      </Box>
+      <Typography variant="subtitle1" fontWeight={600}>
+       
+      </Typography>
 
       <Box sx={{ flex: 1, minHeight: 240 }}>
         {data.length > 0 ? (

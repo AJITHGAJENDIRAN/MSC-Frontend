@@ -44,7 +44,7 @@ const DashboardLayout = () => {
 
   const menuItems = [
     { text: 'Dashboard', icon: <AssessmentIcon fontSize="small" />, path: '/dashboard1' },
-    { text: 'Overallview', icon: <FontAwesomeIcon icon={faShip} fontSize="small" />, path: '/dashboard' },
+    { text: 'Overall View', icon: <FontAwesomeIcon icon={faShip} fontSize="small" />, path: '/dashboard' },
   ];
 
   const drawer = (

@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+
 import axios from 'axios';
 import dayjs from 'dayjs';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import * as XLSX from 'xlsx';
-
+import { Alert, AlertTitle } from '@mui/lab';
 import {
   PieChart, Pie, Cell, Tooltip, Legend,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -56,6 +57,8 @@ const Dashboard1 = () => {
   }
 };
 
+  const alertRef = useRef(null);
+
 
   const fetchDashboardData = useCallback(async () => {
     if (!selectedShip || !dateRange?.[0] || !dateRange?.[1]) return;
@@ -84,6 +87,9 @@ const Dashboard1 = () => {
   useEffect(() => {
     fetchDashboardData();
   }, [fetchDashboardData]);
+
+ 
+
 
   const sampleTypeData = dashboardData?.sample_type_count?.[selectedShip]
     ? Object.entries(dashboardData.sample_type_count[selectedShip]).map(([type, count]) => ({
@@ -133,20 +139,42 @@ const Dashboard1 = () => {
     };
   });
   // Check exceed limits in Filtered Average Particle Counts
-const exceededLimits = filterLineData.flatMap((d) => {
-  const exceeded = [];
+// const exceededLimits = filterLineData.flatMap((d) => {
+//   const exceeded = [];
 
-  if (d.micron === '6 Micron') {
-    if (d.Before > 19) exceeded.push(`${d.micron} - Before: ${d.Before}`);
-    if (d.After > 16) exceeded.push(`${d.micron} - After: ${d.After}`);
-  }
-  if (d.micron === '14 Micron') {
-    if (d.Before > 15) exceeded.push(`${d.micron} - Before: ${d.Before}`);
-    if (d.After > 13) exceeded.push(`${d.micron} - After: ${d.After}`);
-  }
+//   if (d.micron === '6 Micron') {
+//     if (d.Before > 19) exceeded.push(`${d.micron} - Before: ${d.Before}`);
+//     if (d.After > 16) exceeded.push(`${d.micron} - After: ${d.After}`);
+//   }
+//   if (d.micron === '14 Micron') {
+//     if (d.Before > 15) exceeded.push(`${d.micron} - Before: ${d.Before}`);
+//     if (d.After > 13) exceeded.push(`${d.micron} - After: ${d.After}`);
+//   }
 
-  return exceeded;
-});
+//   return exceeded;
+// });
+const exceededLimits = useMemo(() => {
+  const limits = [];
+  filterLineData.forEach((d) => {
+    const { micron, Before, After } = d;
+    if (micron === '6 Micron') {
+      if (Before > 19) limits.push({ label: `${micron} - Before Filter`, actual: Before, limit: 19 });
+      if (After > 16) limits.push({ label: `${micron} - After Filter`, actual: After, limit: 16 });
+    }
+    if (micron === '14 Micron') {
+      if (Before > 15) limits.push({ label: `${micron} - Before Filter`, actual: Before, limit: 15 });
+      if (After > 13) limits.push({ label: `${micron} - After Filter`, actual: After, limit: 13 });
+    }
+  });
+  return limits;
+}, [filterLineData]);
+
+
+ useEffect(() => {
+  if (exceededLimits.length > 0 && alertRef.current) {
+    alertRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}, [exceededLimits]);
 
 
  const exportToPDF = async () => {
@@ -245,11 +273,22 @@ const exceededLimits = filterLineData.flatMap((d) => {
           renderInput={(params) => <TextField {...params} label="Select Ship" variant="outlined" />}
         />
 
-        <RangePicker
+        {/* <RangePicker
           value={dateRange}
           onChange={(dates) => dates?.[0] && dates?.[1] && setDateRange(dates)}
           format="YYYY-MM-DD"
-        />
+        /> */}
+        <RangePicker
+  value={dateRange}
+  onChange={(dates) => dates?.[0] && dates?.[1] && setDateRange(dates)}
+  format="YYYY-MM-DD"
+  allowClear={false}
+  ranges={{
+    'Last 3 Months': [dayjs().subtract(3, 'month'), dayjs()],
+    'Last 6 Months': [dayjs().subtract(6, 'month'), dayjs()],
+    'Last 1 Year': [dayjs().subtract(1, 'year'), dayjs()],
+  }}
+/>
 
         <Button variant="contained" onClick={fetchDashboardData} disabled={!selectedShip}>
           Refresh
@@ -272,7 +311,10 @@ const exceededLimits = filterLineData.flatMap((d) => {
                   </Typography>
                   <Box display="flex" justifyContent="space-between" alignItems="center">
                     <Box width="60%" height={300}>
-                      <ResponsiveContainer width="100%" height="100%">
+                      {sampleTypeData.length === 0 ? (
+  <Typography align="center" color="textSecondary">No data available for this date range</Typography>
+) : (
+  <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                           <Pie
                             data={sampleTypeData}
@@ -289,6 +331,7 @@ const exceededLimits = filterLineData.flatMap((d) => {
                           <Tooltip />
                         </PieChart>
                       </ResponsiveContainer>
+                      )}
                     </Box>
                     <Box width="35%" display="flex" flexDirection="column" gap={1}>
                       {sampleTypeData.map((entry, index) => (
@@ -323,7 +366,10 @@ const exceededLimits = filterLineData.flatMap((d) => {
               <Card>
                 <CardContent>
                   <Typography variant="h6">Purifier vs HCU Count</Typography>
-                  <ResponsiveContainer width="100%" height={300}>
+                  {radialBarData.every(d => d.value === 0) ? (
+  <Typography align="center" color="textSecondary">No data available for this date range</Typography>
+) : (
+  <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={radialBarData} layout="vertical">
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis type="number" />
@@ -332,6 +378,7 @@ const exceededLimits = filterLineData.flatMap((d) => {
                       <Bar dataKey="value" fill="#82ca9d" />
                     </BarChart>
                   </ResponsiveContainer>
+                  )}
                   <Box mt={2} textAlign="center">
                     <Typography variant="subtitle1" fontWeight="bold">
                       Total: {radialBarData.reduce((acc, item) => acc + item.value, 0)}
@@ -344,7 +391,10 @@ const exceededLimits = filterLineData.flatMap((d) => {
   <Card>
     <CardContent>
       <Typography variant="h6">HCU Particle Count</Typography>
-      <ResponsiveContainer width="100%" height={350}>
+      {hcuDetailsWithLabel.length === 0 ? (
+  <Typography align="center" color="textSecondary">No data available for this date range</Typography>
+) : (
+  <ResponsiveContainer width="100%" height={350}>
         <BarChart data={hcuDetailsWithLabel}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
@@ -370,6 +420,7 @@ const exceededLimits = filterLineData.flatMap((d) => {
 </Bar>
         </BarChart>
       </ResponsiveContainer>
+      )}
     </CardContent>
   </Card>
 </Grid>
@@ -380,7 +431,10 @@ const exceededLimits = filterLineData.flatMap((d) => {
                 
                 <CardContent>
                   <Typography variant="h6">Average HCU Particle Counts</Typography>
-                  <ResponsiveContainer width="100%" height={300}>
+                  {avgHCUCounts.length === 0 ? (
+  <Typography align="center" color="textSecondary">No data available for this date range</Typography>
+) : (
+  <ResponsiveContainer width="100%" height={300}>
                     <LineChart data={avgHCUCounts}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="Sample_Point" interval={0} angle={-20} textAnchor="end" height={60} />
@@ -393,6 +447,7 @@ const exceededLimits = filterLineData.flatMap((d) => {
                       <Line type="monotone" dataKey="Average_Particle_Count_14_Micron" stroke="#ffc658" />
                     </LineChart>
                   </ResponsiveContainer>
+                  )}
                   {/* <Box mt={2} textAlign="center">
                     <Typography variant="subtitle1" fontWeight="bold">
                       Total Avg 4μ: {avgHCUCounts.reduce((sum, d) => sum + d.Average_Particle_Count_4_Micron, 0)} | 6μ: {avgHCUCounts.reduce((sum, d) => sum + d.Average_Particle_Count_6_Micron, 0)} | 14μ: {avgHCUCounts.reduce((sum, d) => sum + d.Average_Particle_Count_14_Micron, 0)}
@@ -404,23 +459,66 @@ const exceededLimits = filterLineData.flatMap((d) => {
 
             <Grid item xs={12}>
               <Card>
-                {exceededLimits.length > 0 && (
-  <Box mt={2} p={2} bgcolor="#ffebee" borderRadius={2} border="1px solid red">
-    <Typography variant="subtitle1" color="error" fontWeight="bold">
-      ⚠️ Alert: Exceeded Limits Detected
-    </Typography>
-    <ul style={{ margin: 0, paddingLeft: '1.2rem' }}>
-      {exceededLimits.map((msg, idx) => (
-        <li key={idx}>
-          <Typography variant="body2" color="error">{msg}</Typography>
-        </li>
-      ))}
-    </ul>
+                {/* {exceededLimits.length > 0 && (
+  <Box mt={2}>
+    <Alert severity="error" variant="outlined" sx={{ backgroundColor: '#fff5f5' }}>
+      <AlertTitle>
+        ⚠️ <strong>Exceeded Limits Detected</strong>
+      </AlertTitle>
+      <Box component="ul" sx={{ pl: 2, mb: 0 }}>
+        {exceededLimits.map((msg, idx) => (
+          <li key={idx}>
+            <Typography variant="body2" color="error">
+              {msg}
+            </Typography>
+          </li>
+        ))}
+      </Box>
+    </Alert>
+  </Box>
+)} */}
+               {/* {exceededLimits.length > 0 && (
+  <Box mt={2}>
+    <Alert severity="error" variant="outlined" sx={{ backgroundColor: '#fff5f5' }}>
+      <AlertTitle>
+        ⚠️ <strong>Exceeded Limits Detected</strong>
+      </AlertTitle>
+      <Box component="ul" sx={{ pl: 2, mb: 0 }}>
+        {exceededLimits.map((item, idx) => (
+          <li key={idx}>
+            <Typography variant="body2" color="error">
+              <strong>{item.label}</strong>: Limit = {item.limit}, Actual = {item.actual}
+            </Typography>
+          </li>
+        ))}
+      </Box>
+    </Alert>
+  </Box>
+)} */}
+  {exceededLimits.length > 0 && (
+  <Box mt={2} ref={alertRef}>
+    <Alert severity="error" variant="outlined" sx={{ backgroundColor: '#fff5f5' }}>
+      <AlertTitle>
+        ⚠️ <strong>Exceeded Limits Detected</strong>
+      </AlertTitle>
+      <Box component="ul" sx={{ pl: 2, mb: 0 }}>
+        {exceededLimits.map((item, idx) => (
+          <li key={idx}>
+            <Typography variant="body2" color="error">
+              <strong>{item.label}</strong>: Limit = {item.limit}, Actual = {item.actual}
+            </Typography>
+          </li>
+        ))}
+      </Box>
+    </Alert>
   </Box>
 )}
                 <CardContent>
                   <Typography variant="h6">Filtered Average Particle Counts</Typography>
-                  <ResponsiveContainer width="100%" height={300}>
+                 {filterLineData.every(d => d.Before === 0 && d.After === 0) ? (
+  <Typography align="center" color="textSecondary">No data available for this date range</Typography>
+) : (
+  <ResponsiveContainer width="100%" height={300}>
   <LineChart data={filterLineData}>
     <CartesianGrid strokeDasharray="3 3" />
     <XAxis dataKey="micron" />
@@ -471,6 +569,7 @@ const exceededLimits = filterLineData.flatMap((d) => {
     />
   </LineChart>
 </ResponsiveContainer>
+)}
 
                   {/* <Box mt={2} textAlign="center">
                     <Typography variant="subtitle1" fontWeight="bold">

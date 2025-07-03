@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Grid, Paper, Typography, Box, useTheme } from '@mui/material';
 import PieChartComponent from './Charts/PieChartComponent';
 import ShipHCULineChart from './Charts/ShipHCULineChart';
 import ShipPurifierLineChart from './Charts/ShipPurifierLineChart';
+import { DatePicker } from "antd";
+import dayjs from "dayjs";
+
+const { RangePicker } = DatePicker;
 
 const Dashboard = () => {
   const theme = useTheme();
+  const [dateRange, setDateRange] = useState([dayjs().subtract(30, "days"), dayjs()]);
 
   return (
     <Box sx={{ p: { xs: 2, sm: 3, md: 4 }, backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
@@ -13,24 +18,44 @@ const Dashboard = () => {
         Ship Analytics Dashboard
       </Typography>
 
+      {/* Unified Date Filter */}
+      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
+        {/* <RangePicker
+          size="middle"
+          value={dateRange}
+          onChange={(dates) => dates && setDateRange(dates)}
+          format="YYYY-MM-DD"
+        /> */}
+        <RangePicker
+  size="middle"
+  value={dateRange}
+  onChange={(dates) => dates && setDateRange(dates)}
+  format="YYYY-MM-DD"
+  allowClear={false}
+  ranges={{
+    'Last 3 Months': [dayjs().subtract(3, 'month'), dayjs()],
+    'Last 6 Months': [dayjs().subtract(6, 'month'), dayjs()],
+    'Last 1 Year': [dayjs().subtract(1, 'year'), dayjs()],
+  }}
+/>
+      </Box>
+
       <Grid container spacing={3}>
-        {/* Row 1: Two Side-by-Side Charts */}
         <Grid item xs={12} md={6}>
-          <ChartCard >
-            <PieChartComponent />
+          <ChartCard title="Sample Type Distribution">
+            <PieChartComponent dateRange={dateRange} />
           </ChartCard>
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <ChartCard >
-            <ShipPurifierLineChart />
+          <ChartCard title="Ship Purifier Sample Count">
+            <ShipPurifierLineChart dateRange={dateRange} />
           </ChartCard>
         </Grid>
 
-        {/* Row 2: Full Width Chart */}
         <Grid item xs={12}>
-          <ChartCard  height={350}>
-            <ShipHCULineChart />
+          <ChartCard title="Ship HCU Sample Count" height={350}>
+            <ShipHCULineChart dateRange={dateRange} />
           </ChartCard>
         </Grid>
       </Grid>
