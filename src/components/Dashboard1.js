@@ -74,8 +74,8 @@ const Dashboard1 = () => {
     if (!selectedShip || !dateRange?.[0] || !dateRange?.[1]) return;
     setLoading(true);
     try {
-      // const response = await axios.get('http://52.140.61.220:5000/api/ship-summary', {
-      const response = await axios.get('http://127.0.0.1:5000/api/ship-summary', {
+      const response = await axios.get('http://52.140.61.220:5000/api/ship-summary', {
+      // const response = await axios.get('http://127.0.0.1:5000/api/ship-summary', {
         params: {
           ship: selectedShip,
           start_date: dayjs(dateRange[0]).format('YYYY-MM-DD'),
