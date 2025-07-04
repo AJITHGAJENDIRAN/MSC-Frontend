@@ -26,15 +26,19 @@ const MultiShipFilterPieChart = ({ selectedShips, dateRange }) => {
           start_date: dateRange[0].format('YYYY-MM-DD'),
           end_date: dateRange[1].format('YYYY-MM-DD'),
         };
-        if (selectedShips.length > 0) params.ship = selectedShips.join(',');
 
-        const response = await axios.get('http://52.140.61.220:5000/api/ship-summary', { params });
+        let details = [];
 
-        const details = Array.isArray(response.data?.filter_sample_details)
-          ? (selectedShips.length > 0
-            ? response.data.filter_sample_details.filter(d => selectedShips.includes(d.Ship))
-            : response.data.filter_sample_details)
-          : [];
+        if (selectedShips.length > 0) {
+          // If ships selected → use /api/ship-summary
+          const response = await axios.get('http://52.140.61.220:5000/api/ship-summary', { params });
+          const allDetails = Array.isArray(response.data?.filter_sample_details) ? response.data.filter_sample_details : [];
+          details = allDetails.filter(d => selectedShips.includes(d.Ship));
+        } else {
+          // If only date range → use /api/filter-sample-details
+          const response = await axios.get('http://52.140.61.220:5000/api/filter-sample-details', { params });
+          details = Array.isArray(response.data) ? response.data : [];
+        }
 
         setFilterSampleDetails(details);
       } catch (error) {
@@ -63,7 +67,7 @@ const MultiShipFilterPieChart = ({ selectedShips, dateRange }) => {
       if (exceed14 || exceed6) {
         exceeded++;
         barData.push({
-          label: `${sample.Ship} - ${sample.Sample_Point} (${sample.Test_Date})`,
+          label: `${sample.Ship} - ${sample.Sample_Point} (${sample.Test_Date || sample.Sample_Date || 'N/A'})`,
           samplePoint: sample.Sample_Point,
           fourMicron: sample.Particle_Count_4_Micron,
           sixMicron: sample.Particle_Count_6_Micron,
@@ -91,76 +95,80 @@ const MultiShipFilterPieChart = ({ selectedShips, dateRange }) => {
   };
 
   return (
-    <Card>
-      <CardContent>
-       
-        {loading ? (
-          <Box textAlign="center" mt={3}>
-            <CircularProgress />
-          </Box>
+    <Card sx={{ p: 2, borderRadius: 3 }}>
+  <CardContent>
+    {loading ? (
+      <Box textAlign="center" mt={4}>
+        <CircularProgress />
+      </Box>
+    ) : (
+      <>
+        {(normalCount + exceededCount) === 0 ? (
+          <Typography align="center" color="textSecondary" mt={2}>
+            No samples found for the selected date range {selectedShips.length > 0 ? 'and ships' : ''}
+          </Typography>
         ) : (
-          <>
-            {(normalCount + exceededCount) === 0 ? (
-              <Typography align="center" color="textSecondary">
-                Please Select the ship & Date Range
-              </Typography>
-            ) : (
-              <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Box width="60%" height={300}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={pieData}
-                        dataKey="value"
-                        nameKey="name"
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={70}
-                        outerRadius={100}
-                        paddingAngle={3}
-                        label
-                      >
-                        {pieData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={COLORS[index % COLORS.length]}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
+          <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} alignItems="stretch" gap={3}>
+            
+            {/* Pie Chart Section */}
+            <Box flex={1} minHeight={300} mt={-4}>
+  <Typography variant="subtitle1" fontWeight="bold" align="center" mb={1}>
+    Total Samples: {normalCount + exceededCount}
+  </Typography>
+  <ResponsiveContainer width="100%" height={280}>
+    <PieChart>
+      <Pie
+        data={pieData}
+        dataKey="value"
+        nameKey="name"
+        cx="50%"
+        cy="48%"   // Move Pie slightly up by adjusting center Y
+        innerRadius={70}
+        outerRadius={100}
+        paddingAngle={3}
+        label
+      >
+        {pieData.map((entry, index) => (
+          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+        ))}
+      </Pie>
+      <Tooltip />
+    </PieChart>
+  </ResponsiveContainer>
+</Box>
+
+            {/* Legend Section */}
+            <Box flex={0.6} display="flex" flexDirection="column" justifyContent="center" gap={1}>
+              {pieData.map((entry, index) => (
+                <Box
+                  key={entry.name}
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  bgcolor={COLORS[index % COLORS.length]}
+                  px={2}
+                  py={1}
+                  borderRadius={1}
+                  color="#fff"
+                  fontWeight={600}
+                  sx={{
+                    cursor: entry.name === 'Exceeded Limit Samples' ? 'pointer' : 'default',
+                    transition: 'background 0.3s',
+                    '&:hover': {
+                      opacity: entry.name === 'Exceeded Limit Samples' ? 0.9 : 1,
+                    },
+                  }}
+                  onClick={entry.name === 'Exceeded Limit Samples' ? handleExceededLabelClick : undefined}
+                >
+                  <span>{entry.name}</span>
+                  <span>{entry.value}</span>
                 </Box>
-                <Box width="35%" display="flex" flexDirection="column" gap={1}>
-                  {pieData.map((entry, index) => (
-                    <Box
-                      key={entry.name}
-                      display="flex"
-                      justifyContent="space-between"
-                      alignItems="center"
-                      bgcolor={COLORS[index % COLORS.length]}
-                      px={2}
-                      py={1}
-                      borderRadius={1}
-                      color="#fff"
-                      fontWeight={600}
-                      sx={{ cursor: entry.name === 'Exceeded Limit Samples' ? 'pointer' : 'default' }}
-                      onClick={entry.name === 'Exceeded Limit Samples' ? handleExceededLabelClick : undefined}
-                    >
-                      <span>{entry.name}</span>
-                      <span>{entry.value}</span>
-                    </Box>
-                  ))}
-                </Box>
-              </Box>
-            )}
-            <Box mt={2} textAlign="center">
-              <Typography variant="subtitle1" fontWeight="bold">
-                Total Samples: {normalCount + exceededCount}
-              </Typography>
+              ))}
             </Box>
-          </>
+          </Box>
         )}
+      </>
+    )}
 
         {/* Dialog for Exceeded Samples */}
         <Dialog open={showExceededModal} onClose={() => setShowExceededModal(false)} maxWidth="md" fullWidth>
