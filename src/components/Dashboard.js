@@ -90,7 +90,18 @@ const Dashboard = () => {
               'Last 2 Years': [dayjs().subtract(2, 'year'), dayjs()],
             }}
           />
+         
         </Box>
+          <Typography
+        variant="body2"
+        sx={{
+          mt: 1,
+          color: 'gray',
+          fontStyle: 'italic',
+        }}
+      >
+        Data from: {dateRange[0]?.format("MMMM D, YYYY")} to {dateRange[1]?.format("MMMM D, YYYY")}
+      </Typography>
       </Paper>
 
       <Grid container spacing={3}>

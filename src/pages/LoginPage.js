@@ -27,7 +27,7 @@ export default function LoginPage() {
                 // Store the authentication token
                 localStorage.setItem('token', response.data.token);
                 // Redirect to dashboard after successful login
-                navigate("/dashboard1");
+                navigate("/dashboard");
             })
             .catch((error) => {
                 console.error(error);

@@ -14,11 +14,11 @@ import {
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-
-
 import {
-  Box, Button, Typography, MenuItem, CircularProgress, Grid, Card, CardContent, TextField
+  Box, Button, Typography, MenuItem, CircularProgress, Grid, Card, CardContent, TextField,
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 } from '@mui/material';
+
 import { DatePicker } from 'antd';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -341,33 +341,41 @@ const exceededLimits = useMemo(() => {
         <Button variant="outlined" onClick={exportToPDF} disabled={!dashboardData}>Export PDF</Button>
         
       </Box> */}
-      <Box
+     <Box
   display="flex"
   alignItems="center"
+  justifyContent="flex-start"
+  flexWrap="wrap"
   gap={2}
   mb={4}
   sx={{
-    flexWrap: 'nowrap',
-    overflowX: 'auto',
-    '& > *': { whiteSpace: 'nowrap' }
+    flexDirection: {
+      xs: 'column',  // Stack vertically on phones
+      sm: 'row',     // Row on tablets/laptops
+    },
+    '& > *': {
+      whiteSpace: 'nowrap',
+      flexShrink: 0,
+    }
   }}
 >
-<Autocomplete
-  sx={{ minWidth: 500, minHeight: 20 }}
-  options={shipOptions}
-  value={selectedShip}
-  onChange={(e, value) => setSelectedShip(value || '')}
-  renderInput={(params) => (
-    <TextField
-      {...params}
-      placeholder="Select Ship"        // 👈 Use placeholder instead of label
-      variant="outlined"
-      InputLabelProps={{ shrink: false }}
-    />
-  )}
-/>
+  {/* Ship Dropdown */}
+  <Autocomplete
+    sx={{ minWidth: 200, flex: '1 1 auto', maxWidth: 300 }}
+    options={shipOptions}
+    value={selectedShip}
+    onChange={(e, value) => setSelectedShip(value || '')}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        placeholder="Select Ship"
+        variant="outlined"
+        InputLabelProps={{ shrink: false }}
+      />
+    )}
+  />
 
-
+  {/* Date Range Picker */}
   <RangePicker
     value={dateRange}
     onChange={(dates) => dates?.[0] && dates?.[1] && setDateRange(dates)}
@@ -379,16 +387,34 @@ const exceededLimits = useMemo(() => {
       'Last 1 Year': [dayjs().subtract(1, 'year'), dayjs()],
       'Last 2 Year': [dayjs().subtract(2, 'year'), dayjs()],
     }}
-    style={{ minWidth: 250 }}
+    style={{
+      minWidth: 240,
+      maxWidth: 280,
+      flex: '1 1 auto'
+    }}
   />
 
-  <Button variant="contained" onClick={fetchDashboardData} disabled={!selectedShip}>
+  {/* Refresh Button */}
+  <Button
+    variant="contained"
+    onClick={fetchDashboardData}
+    disabled={!selectedShip}
+    sx={{ minWidth: 100 }}
+  >
     Refresh
   </Button>
-  <Button variant="outlined" onClick={exportToPDF} disabled={!dashboardData}>
+
+  {/* Export Button */}
+  <Button
+    variant="outlined"
+    onClick={exportToPDF}
+    disabled={!dashboardData}
+    sx={{ minWidth: 100 }}
+  >
     Export PDF
   </Button>
 </Box>
+
 {/* <Button variant="outlined" onClick={exportToExcel} disabled={!dashboardData}>Export Excel</Button> */}
       {/* Dashboard Charts */}
       {loading ? (
@@ -628,7 +654,7 @@ const exceededLimits = useMemo(() => {
     </Alert>
   </Box>
 )} */}
-               {/* {exceededLimits.length > 0 && (
+               {exceededLimits.length > 0 && (
   <Box mt={2}>
     <Alert severity="error" variant="outlined" sx={{ backgroundColor: '#fff5f5' }}>
       <AlertTitle>
@@ -638,25 +664,7 @@ const exceededLimits = useMemo(() => {
         {exceededLimits.map((item, idx) => (
           <li key={idx}>
             <Typography variant="body2" color="error">
-              <strong>{item.label}</strong>: Limit = {item.limit}, Actual = {item.actual}
-            </Typography>
-          </li>
-        ))}
-      </Box>
-    </Alert>
-  </Box>
-)} */}
-  {exceededLimits.length > 0 && (
-  <Box mt={2} ref={alertRef}>
-    <Alert severity="error" variant="outlined" sx={{ backgroundColor: '#fff5f5' }}>
-      <AlertTitle>
-        ⚠️ <strong>Exceeded Limits Detected</strong>
-      </AlertTitle>
-      <Box component="ul" sx={{ pl: 2, mb: 0 }}>
-        {exceededLimits.map((item, idx) => (
-          <li key={idx}>
-            <Typography variant="body2" color="error">
-              <strong>{item.label}</strong>:  Actual = {item.actual} , MAN Limit = {item.limit}
+              <strong>{item.label}</strong>: Actual = {item.actual} , MAN Limit = {item.limit}
             </Typography>
           </li>
         ))}
@@ -664,6 +672,70 @@ const exceededLimits = useMemo(() => {
     </Alert>
   </Box>
 )}
+{/* {exceededLimits.length > 0 && (
+ <Box mb={4}>
+  <Alert
+    severity="error"
+    variant="outlined"
+    sx={{
+      backgroundColor: '#fff5f5',
+      p: 1,
+    }}
+  >
+    <AlertTitle sx={{ mb: 1 }}>
+      ⚠️ <strong>Exceeded Limits Detected</strong>
+    </AlertTitle>
+
+    <Box sx={{ overflowX: 'auto' }}>
+      <TableContainer component="div" sx={{ width: '100%' }}>
+        <Table
+          size="small"
+          sx={{
+            width: '100%',
+            minWidth: 1000, // Ensures table stretches
+            borderCollapse: 'collapse',
+          }}
+        >
+          <TableHead>
+            <TableRow sx={{ backgroundColor: '#fdeaea' }}>
+              <TableCell sx={{ p: 1, fontWeight: 'bold' }}>Label</TableCell>
+              <TableCell align="center" sx={{ p: 1, fontWeight: 'bold' }}>Parameter</TableCell>
+              <TableCell align="center" sx={{ p: 1, fontWeight: 'bold' }}>Actual</TableCell>
+              <TableCell align="center" sx={{ p: 1, fontWeight: 'bold' }}>MAN Limit</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {exceededSampleBarData
+              .filter(sample =>
+                (sample.samplePoint === 'BEFORE FILTER' && (sample.sixMicron > 19 || sample.fourteenMicron > 15)) ||
+                (sample.samplePoint === 'AFTER FILTER' && (sample.sixMicron > 16 || sample.fourteenMicron > 13))
+              )
+              .flatMap((sample, idx) => {
+                const rows = [];
+                const limit6 = sample.samplePoint === 'BEFORE FILTER' ? 19 : 16;
+                const limit14 = sample.samplePoint === 'BEFORE FILTER' ? 15 : 13;
+                if (sample.sixMicron > limit6) {
+                  rows.push({ label: sample.label, param: '6μ', actual: sample.sixMicron, limit: limit6 });
+                }
+                if (sample.fourteenMicron > limit14) {
+                  rows.push({ label: sample.label, param: '14μ', actual: sample.fourteenMicron, limit: limit14 });
+                }
+                return rows.map((row, i) => (
+                  <TableRow key={`${idx}-${i}`}>
+                    <TableCell sx={{ p: 1 }}>{row.label}</TableCell>
+                    <TableCell align="center" sx={{ p: 1 }}>{row.param}</TableCell>
+                    <TableCell align="center" sx={{ p: 1, color: 'red', fontWeight: 500 }}>{row.actual}</TableCell>
+                    <TableCell align="center" sx={{ p: 1 }}>{row.limit}</TableCell>
+                  </TableRow>
+                ));
+              })}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
+  </Alert>
+</Box>
+)} */}
                 <CardContent>
                   <Typography variant="h6">Filtered Average Particle Counts</Typography>
                  {filterLineData.every(d => d.Before === 0 && d.After === 0) ? (
@@ -739,121 +811,159 @@ const exceededLimits = useMemo(() => {
       )}
 
      <Dialog open={showExceededModal} onClose={() => setShowExceededModal(false)} maxWidth="md" fullWidth>
-  <DialogTitle>Exceeded Filter Sample Limits</DialogTitle>
-  <DialogContent>
- {exceededSampleBarData.length > 0 && (
-  <Box mb={2}>
-    <Alert severity="error" variant="outlined" sx={{ backgroundColor: '#fff5f5' }}>
-      <AlertTitle>
-        ⚠️ <strong>Exceeded Limits Detected</strong>
-      </AlertTitle>
-      <Box component="ul" sx={{ pl: 2, mb: 0 }}>
-        {exceededSampleBarData
-          .filter(sample =>
-            (sample.samplePoint === 'BEFORE FILTER' && (sample.sixMicron > 19 || sample.fourteenMicron > 15)) ||
-            (sample.samplePoint === 'AFTER FILTER' && (sample.sixMicron > 16 || sample.fourteenMicron > 13))
-          )
-          .map((sample, idx) => {
-            const exceededDetails = [];
+        <DialogTitle>Exceeded Filter Sample Limits</DialogTitle>
+        <DialogContent>
+          {exceededSampleBarData.length > 0 && (
+   <Box mb={4}>
+  <Alert
+    severity="error"
+    variant="outlined"
+    sx={{
+      backgroundColor: '#fff5f5',
+      p: 1,
+    }}
+  >
+    <AlertTitle sx={{ mb: 1 }}>
+      ⚠️ <strong>Exceeded Limits Detected</strong>
+    </AlertTitle>
 
-            if (
-              (sample.samplePoint === 'BEFORE FILTER' && sample.sixMicron > 19) ||
-              (sample.samplePoint === 'AFTER FILTER' && sample.sixMicron > 16)
-            ) {
-              const limit = sample.samplePoint === 'BEFORE FILTER' ? 19 : 16;
-              exceededDetails.push(`6μ: Actual = ${sample.sixMicron}, MAN Limit = ${limit}`);
-            }
+    <Box sx={{ overflowX: 'auto' }}>
+      <TableContainer component="div" sx={{ width: '100%' }}>
+        <Table
+          size="small"
+          sx={{
+            width: '100%',
+            minWidth: 750, // Ensures table stretches
+            borderCollapse: 'collapse',
+          }}
+        >
+          <TableHead>
+            <TableRow sx={{ backgroundColor: '#fdeaea' }}>
+              <TableCell sx={{ p: 1, fontWeight: 'bold' }}>Label</TableCell>
+              <TableCell align="center" sx={{ p: 1, fontWeight: 'bold' }}>Parameter</TableCell>
+              <TableCell align="center" sx={{ p: 1, fontWeight: 'bold' }}>Actual</TableCell>
+              <TableCell align="center" sx={{ p: 1, fontWeight: 'bold' }}>MAN Limit</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {exceededSampleBarData
+              .filter(sample =>
+                (sample.samplePoint === 'BEFORE FILTER' && (sample.sixMicron > 19 || sample.fourteenMicron > 15)) ||
+                (sample.samplePoint === 'AFTER FILTER' && (sample.sixMicron > 16 || sample.fourteenMicron > 13))
+              )
+              .flatMap((sample, idx) => {
+                const rows = [];
+                const limit6 = sample.samplePoint === 'BEFORE FILTER' ? 19 : 16;
+                const limit14 = sample.samplePoint === 'BEFORE FILTER' ? 15 : 13;
+                if (sample.sixMicron > limit6) {
+                  rows.push({ label: sample.label, param: '6μ', actual: sample.sixMicron, limit: limit6 });
+                }
+                if (sample.fourteenMicron > limit14) {
+                  rows.push({ label: sample.label, param: '14μ', actual: sample.fourteenMicron, limit: limit14 });
+                }
+                return rows.map((row, i) => (
+                  <TableRow key={`${idx}-${i}`}>
+                    <TableCell sx={{ p: 1 }}>{row.label}</TableCell>
+                    <TableCell align="center" sx={{ p: 1 }}>{row.param}</TableCell>
+                    <TableCell align="center" sx={{ p: 1, color: 'red', fontWeight: 500 }}>{row.actual}</TableCell>
+                    <TableCell align="center" sx={{ p: 1 }}>{row.limit}</TableCell>
+                  </TableRow>
+                ));
+              })}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
+  </Alert>
+</Box>
+          )}
 
-            if (
-              (sample.samplePoint === 'BEFORE FILTER' && sample.fourteenMicron > 15) ||
-              (sample.samplePoint === 'AFTER FILTER' && sample.fourteenMicron > 13)
-            ) {
-              const limit = sample.samplePoint === 'BEFORE FILTER' ? 15 : 13;
-              exceededDetails.push(`14μ: Actual = ${sample.fourteenMicron}, MAN Limit = ${limit}`);
-            }
+          {filterLineData.length === 0 ? (
+            <Typography>No data available</Typography>
+          ) : (
+            <ResponsiveContainer width="100%" height={400}>
+              <BarChart data={exceededSampleBarData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="label"
+                  angle={-20}
+                  textAnchor="end"
+                  interval={0}
+                  height={80}
+                  tick={{ fontSize: 10 }}
+                />
+                <YAxis />
+                <Tooltip />
+                <Legend />
 
-            return (
-              <li key={idx}>
-                <Typography variant="body2" color="error">
-                  <strong>{sample.label}</strong> — {exceededDetails.join(' | ')}
-                </Typography>
-              </li>
-            );
-          })}
-      </Box>
-    </Alert>
-  </Box>
-    )}
+                {/* 4 Micron - default color, with label */}
+                <Bar dataKey="fourMicron" name="4 Micron" fill="#ffc658">
+                  <LabelList
+                    dataKey="fourMicron"
+                    content={({ x, y, width, height, value }) => (
+                      <text
+                        x={x + width / 2}
+                        y={y - 6 }
+                        fill="#000"
+                        fontSize={14}
+                        textAnchor="middle"
+                      >
+                        {value}
+                      </text>
+                    )}
+                  />
+                </Bar>
 
-    {filterLineData.length === 0 ? (
-      <Typography>No data available</Typography>
-    ) : (
-     <ResponsiveContainer width="100%" height={400}>
-  <BarChart data={exceededSampleBarData}>
-    <CartesianGrid strokeDasharray="3 3" />
-    <XAxis
-      dataKey="label"
-      angle={-20}
-      textAnchor="end"
-      interval={0}
-      height={80}
-      tick={{ fontSize: 10 }}
-    />
-    <YAxis />
-    <Tooltip />
-    <Legend />
+                {/* 6 Micron - show label in red only if exceeded */}
+                <Bar dataKey="sixMicron" name="6 Micron" fill="#82ca9d">
+                  <LabelList
+                    dataKey="sixMicron"
+                    position="insideTop"
+                    content={({ x, y, width, height, value, index }) => {
+                      const limit = exceededSampleBarData[index].samplePoint === 'BEFORE FILTER' ? 19 : 16;
+                      const fill = value > limit ? 'red' : '#000';
+                      return (
+                        <text
+                          x={x + width / 2}
+                          y={y - 6 }
+                          fill={fill}
+                          fontSize={14}
+                          textAnchor="middle"
+                        >
+                          {value}
+                        </text>
+                      );
+                    }}
+                  />
+                </Bar>
 
-    {/* 4 Micron (no limit, default color, show label) */}
-    <Bar dataKey="fourMicron" name="4 Micron" fill="#ffc658">
-      <LabelList
-        dataKey="fourMicron"
-        position="top"
-        formatter={(value) => `${value}`}
-      />
-    </Bar>
-
-    {/* 6 Micron (limit logic + label) */}
-    <Bar dataKey="sixMicron" name="6 Micron">
-      {exceededSampleBarData.map((entry, index) => {
-        const limit = entry.samplePoint === 'BEFORE FILTER' ? 19 : 16;
-        return (
-          <Cell
-            key={`6-${index}`}
-            fill={entry.sixMicron > limit ? 'red' : '#82ca9d'}
-          />
-        );
-      })}
-      <LabelList
-        dataKey="sixMicron"
-        position="top"
-        formatter={(value) => `${value}`}
-      />
-    </Bar>
-
-    {/* 14 Micron (limit logic + label) */}
-    <Bar dataKey="fourteenMicron" name="14 Micron">
-      {exceededSampleBarData.map((entry, index) => {
-        const limit = entry.samplePoint === 'BEFORE FILTER' ? 15 : 13;
-        return (
-          <Cell
-            key={`14-${index}`}
-            fill={entry.fourteenMicron > limit ? 'red' : '#8884d8'}
-          />
-        );
-      })}
-      <LabelList
-        dataKey="fourteenMicron"
-        position="top"
-        formatter={(value) => `${value}`}
-      />
-    </Bar>
-  </BarChart>
-</ResponsiveContainer>
-    )}
-  </DialogContent>
-</Dialog>
-
-
+                {/* 14 Micron - show label in red only if exceeded */}
+                <Bar dataKey="fourteenMicron" name="14 Micron" fill="#8884d8">
+                  <LabelList
+                    dataKey="fourteenMicron"
+                    position="insideTop"
+                    content={({ x, y, width, height, value, index }) => {
+                      const limit = exceededSampleBarData[index].samplePoint === 'BEFORE FILTER' ? 15 : 13;
+                      const fill = value > limit ? 'red' : '#000';
+                      return (
+                        <text
+                          x={x + width / 2}
+                          y={y - 6 }
+                          fill={fill}
+                          fontSize={14}
+                          textAnchor="middle"
+                        >
+                          {value}
+                        </text>
+                      );
+                    }}
+                  />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };

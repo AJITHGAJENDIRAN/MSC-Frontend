@@ -1,4 +1,5 @@
-// DashboardLayout.jsx (Improved UI Version)
+// DashboardLayout.jsx (Optimized for 1440p laptops)
+
 import React from 'react';
 import {
   Box, CssBaseline, Drawer, AppBar, Toolbar,
@@ -8,15 +9,13 @@ import {
 import {
   Menu as MenuIcon,
   Person as PersonIcon,
-  BarChart as BarChartIcon,
   Assessment as AssessmentIcon,
 } from '@mui/icons-material';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShip } from '@fortawesome/free-solid-svg-icons';
-import { text } from '@fortawesome/fontawesome-svg-core';
 
-const drawerWidth = 260;
+const drawerWidth = 240; // optimized for standard 15" laptop
 
 const DashboardLayout = () => {
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -44,9 +43,9 @@ const DashboardLayout = () => {
   };
 
   const menuItems = [
-    { text: 'Dashboard', icon: <AssessmentIcon fontSize="small" />, path: '/dashboard1' },
-    { text: 'Overall View', icon: <FontAwesomeIcon icon={faShip} fontSize="small" />, path: '/dashboard' },
-    
+    { text: 'HCU Data Summary', icon: <FontAwesomeIcon icon={faShip} fontSize="small" />, path: '/dashboard' },
+    { text: 'HCU Data Analysis', icon: <AssessmentIcon fontSize="small" />, path: '/dashboard1' },
+    { text: 'Filter Ship Comparison', icon: <FontAwesomeIcon icon={faShip} fontSize="small" />, path: '/compareship' },
   ];
 
   const drawer = (
@@ -59,27 +58,27 @@ const DashboardLayout = () => {
       px: 1,
       overflowY: 'auto'
     }}>
-     <Box
-  sx={{
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    mb: 3,
-    height: 60, // Fixed height for vertical alignment
-    px: 2 // Optional horizontal padding
-  }}
->
-  <Box
-    component="img"
-    src="/images/logo-removebg-preview.png"
-    alt="ViswaGroup Logo"
-    sx={{
-      maxHeight: '150%',
-      maxWidth: '150%',
-      objectFit: 'contain'
-    }}
-  />
-</Box>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          mb: 3,
+          height: 60,
+          px: 2
+        }}
+      >
+        <Box
+          component="img"
+          src="/images/logo-removebg-preview.png"
+          alt="ViswaGroup Logo"
+          sx={{
+            maxHeight: '150%',
+            maxWidth: '150%',
+            objectFit: 'contain'
+          }}
+        />
+      </Box>
 
       <Divider sx={{ mb: 2 }} />
 
@@ -145,6 +144,7 @@ const DashboardLayout = () => {
     <Box sx={{ display: 'flex', backgroundColor: theme.secondary }}>
       <CssBaseline />
 
+      {/* App Bar */}
       <AppBar
         position="fixed"
         elevation={0}
@@ -161,13 +161,22 @@ const DashboardLayout = () => {
             <IconButton edge="start" onClick={handleDrawerToggle} sx={{ display: { sm: 'none' } }}>
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" noWrap sx={{ color: theme.text, fontWeight: 600 }}>
+            <Typography
+              variant="h6"
+              noWrap
+              sx={{
+                color: theme.text,
+                fontWeight: 600,
+                fontSize: { xs: '1rem', sm: '1.15rem', md: '1.25rem' }
+              }}
+            >
               Viswa Ship Analytics
             </Typography>
           </Box>
         </Toolbar>
       </AppBar>
 
+      {/* Navigation Drawer */}
       <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}>
         <Drawer
           variant="temporary"
@@ -199,6 +208,7 @@ const DashboardLayout = () => {
         </Drawer>
       </Box>
 
+      {/* Main Content */}
       <Box
         component="main"
         sx={{
@@ -207,20 +217,21 @@ const DashboardLayout = () => {
           minHeight: '100vh',
           pt: 8,
           pb: 4,
-          px: { xs: 2, sm: 3, md: 5 },
+          px: { xs: 2, sm: 3, md: 4 },
           backgroundColor: theme.secondary,
           overflow: 'hidden'
         }}
       >
         <Container
-          maxWidth="xl"
+          maxWidth="lg"
           disableGutters
           sx={{
             backgroundColor: theme.white,
             borderRadius: theme.radius,
             boxShadow: theme.shadow,
-            p: { xs: 2, sm: 3, md: 4 },
-            minHeight: 'calc(100vh - 160px)'
+            p: { xs: 2, sm: 3, md: 3.5 },
+            minHeight: 'calc(100vh - 160px)',
+            overflow: 'auto'
           }}
         >
           <Outlet />
