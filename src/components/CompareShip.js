@@ -3,7 +3,7 @@ import axios from 'axios';
 import dayjs from 'dayjs';
 import { DatePicker } from 'antd';
 import {
-  Box, Button, Typography, CircularProgress, Grid, Card, CardContent, TextField, Dialog, DialogTitle, DialogContent, Alert, AlertTitle
+  Box, Button, Typography, CircularProgress, Grid, Card, CardContent, TextField, Dialog, DialogTitle, DialogContent, Alert, AlertTitle, Divider
 } from '@mui/material';
 import { LabelList } from 'recharts';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -344,7 +344,7 @@ const label = `${samplePoint.toUpperCase()} (${date})`;
         <Legend />
       </PieChart>
     </ResponsiveContainer>
-
+<Divider sx={{ my: 2 }} />
    <Typography variant="subtitle2">Filter Sample Details</Typography>
 <ResponsiveContainer width="100%" height={300}>
   <BarChart data={dashboardData[ship]?.filter_sample_bar_data}>
@@ -443,7 +443,7 @@ const label = `${samplePoint.toUpperCase()} (${date})`;
     </Alert>
   </Box>
 )}
-
+<Divider sx={{ my: 2 }} />
     <Typography variant="subtitle2">Before vs After Filter Averages</Typography>
     <ResponsiveContainer width="100%" height={200}>
       <LineChart data={dashboardData[ship]?.filter_line_data}>

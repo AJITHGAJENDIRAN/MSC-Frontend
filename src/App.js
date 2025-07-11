@@ -7,8 +7,6 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardLayout from './components/DashboardLayout';
 import Dashboard from './components/Dashboard';
-import HCUAnalytics from './components/HCUAnalytics';
-import HCUAverage from './components/HCUAverage';
 import ShipFilter from './components/ShipFilter';
 import Dashboard1 from './components/Dashboard1';
 import CompareShip from './components/CompareShip';
@@ -59,8 +57,8 @@ const App = () => {
                 }
               >
                 <Route index element={<HCUAnalytics />} />
-              </Route>
-              <Route
+              </Route> */}
+              {/* <Route
                 path="/hcu-average"
                 element={
                   <PrivateRoute>

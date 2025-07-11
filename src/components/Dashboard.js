@@ -10,12 +10,16 @@ import PieChartComponent from './Charts/PieChartComponent';
 import ShipHCULineChart from './Charts/ShipHCULineChart';
 import ShipPurifierLineChart from './Charts/ShipPurifierLineChart';
 import MultiShipFilterPieChart from './Charts/MultiShipFilterPieChart';
+import ShipSampleStatusBarChart from './Charts/ShipSampleStatusBarChart';
 
 const { RangePicker } = DatePicker;
 
 const Dashboard = () => {
   const theme = useTheme();
-  const [dateRange, setDateRange] = useState([dayjs().subtract(30, "days"), dayjs()]);
+  const [dateRange, setDateRange] = useState([
+  dayjs().subtract(1, 'year'),
+  dayjs()
+]);
   const [shipOptions, setShipOptions] = useState([]);
   const [selectedShips, setSelectedShips] = useState([]);
 
@@ -66,15 +70,18 @@ const Dashboard = () => {
             filterSelectedOptions
             getOptionLabel={(option) => option}
             renderInput={(params) => (
+              
               <TextField
                 {...params}
                 variant="outlined"
-                label="Select Ships"
+                // label="Select Ships"
+                label={`Select Ships (${shipOptions.length})`}
                 placeholder="Ships"
               />
             )}
-            sx={{ minWidth: 400 }}
+            sx={{ minWidth: 300 }}
           />
+          
 
           <RangePicker
             size="middle"
@@ -114,6 +121,12 @@ const Dashboard = () => {
         <Grid item xs={12} md={6}>
           <ChartCard title="Filter Sample Classification">
             <MultiShipFilterPieChart dateRange={dateRange} selectedShips={selectedShips} />
+          </ChartCard>
+        </Grid>
+        
+        <Grid item xs={12}>
+          <ChartCard title="Ship Sample Submission Status" height={380}>
+           <ShipSampleStatusBarChart dateRange={dateRange} selectedShips={selectedShips} />
           </ChartCard>
         </Grid>
 

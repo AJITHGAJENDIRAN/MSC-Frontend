@@ -81,8 +81,8 @@ const ShipHCULineChart = ({ dateRange, selectedShips }) => {
           style={{ marginBottom: "8px", borderRadius: 6 }}
         />
       ) : (
-        <ResponsiveContainer width="100%" height={320}>
-          <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 80 }}>
+        <ResponsiveContainer width="100%" height={350}>
+          <BarChart data={data} margin={{ top: 20, right: 10, left: 0, bottom: 80 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
             <XAxis
               dataKey="ship_name"

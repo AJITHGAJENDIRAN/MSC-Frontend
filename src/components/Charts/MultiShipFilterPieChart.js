@@ -226,7 +226,7 @@ const MultiShipFilterPieChart = ({ selectedShips, dateRange }) => {
               </Box>
             )}
 
-            <ResponsiveContainer width="100%" height={400}>
+            {/* <ResponsiveContainer width="100%" height={400}>
   <BarChart data={exceededSampleBarData}>
     <CartesianGrid strokeDasharray="3 3" />
     <XAxis
@@ -241,7 +241,7 @@ const MultiShipFilterPieChart = ({ selectedShips, dateRange }) => {
     <Tooltip />
     <Legend />
 
-    {/* 4 Micron Bar */}
+    
     <Bar dataKey="fourMicron" name="4 Micron" fill="#ffc658">
       <LabelList
         dataKey="fourMicron"
@@ -260,7 +260,7 @@ const MultiShipFilterPieChart = ({ selectedShips, dateRange }) => {
       />
     </Bar>
 
-    {/* 6 Micron Bar */}
+   
     <Bar dataKey="sixMicron" name="6 Micron" fill="#82ca9d">
       <LabelList
         dataKey="sixMicron"
@@ -284,7 +284,7 @@ const MultiShipFilterPieChart = ({ selectedShips, dateRange }) => {
       />
     </Bar>
 
-    {/* 14 Micron Bar */}
+    
     <Bar dataKey="fourteenMicron" name="14 Micron" fill="#8884d8">
       <LabelList
         dataKey="fourteenMicron"
@@ -308,7 +308,95 @@ const MultiShipFilterPieChart = ({ selectedShips, dateRange }) => {
       />
     </Bar>
   </BarChart>
-</ResponsiveContainer>
+</ResponsiveContainer> */}
+<Box sx={{ overflowX: 'auto' }}>
+  <Box sx={{ minWidth: exceededSampleBarData.length * 100, height: 420  }}>
+    <ResponsiveContainer width="100%" height={400}>
+      <BarChart data={exceededSampleBarData}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis
+          dataKey="label"
+          angle={-20}
+          textAnchor="end"
+          interval={0}
+          height={80}
+          tick={{ fontSize: 10 }}
+        />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+
+        {/* 4 Micron Bar */}
+        <Bar dataKey="fourMicron" name="4 Micron" fill="#ffc658">
+          <LabelList
+            dataKey="fourMicron"
+            position="top"
+            content={({ x, y, width, value }) => (
+              <text
+                x={x + width / 2}
+                y={y - 6}
+                fill="#000"
+                fontSize={12}
+                textAnchor="middle"
+              >
+                {value}
+              </text>
+            )}
+          />
+        </Bar>
+
+        {/* 6 Micron Bar */}
+        <Bar dataKey="sixMicron" name="6 Micron" fill="#82ca9d">
+          <LabelList
+            dataKey="sixMicron"
+            position="top"
+            content={({ x, y, width, value, index }) => {
+              const sample = exceededSampleBarData[index];
+              const limit = sample.samplePoint === 'BEFORE FILTER' ? 19 : 16;
+              const isExceeded = value > limit;
+              return (
+                <text
+                  x={x + width / 2}
+                  y={y - 6}
+                  fill={isExceeded ? 'red' : '#000'}
+                  fontSize={12}
+                  textAnchor="middle"
+                >
+                  {value}
+                </text>
+              );
+            }}
+          />
+        </Bar>
+
+        {/* 14 Micron Bar */}
+        <Bar dataKey="fourteenMicron" name="14 Micron" fill="#8884d8">
+          <LabelList
+            dataKey="fourteenMicron"
+            position="top"
+            content={({ x, y, width, value, index }) => {
+              const sample = exceededSampleBarData[index];
+              const limit = sample.samplePoint === 'BEFORE FILTER' ? 15 : 13;
+              const isExceeded = value > limit;
+              return (
+                <text
+                  x={x + width / 2}
+                  y={y - 6}
+                  fill={isExceeded ? 'red' : '#000'}
+                  fontSize={12}
+                  textAnchor="middle"
+                >
+                  {value}
+                </text>
+              );
+            }}
+          />
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  </Box>
+</Box>
+
 
           </DialogContent>
         </Dialog>

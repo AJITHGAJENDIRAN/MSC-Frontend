@@ -63,7 +63,9 @@ export default function LoginPage() {
                 <button onClick={logInUser} className="btn btn-primary">Login</button>
 
                 <p className="register-text">
-                    Don't have an account? <a href="/register" className="register-link">Register</a>
+                    Don’t have an account?
+                    Please contact your Viswa representative for access.
+                    {/* <a href="/register" className="register-link">Register</a> */}
                 </p>
             </div>
         </div>
